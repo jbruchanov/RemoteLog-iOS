@@ -7,6 +7,7 @@
 //
 
 #import "remotelogTests.h"
+#import "RLog.h"
 
 @implementation remotelogTests
 
@@ -26,7 +27,7 @@
 
 - (void)testExample
 {
-    STFail(@"Unit tests are not implemented yet in remotelogTests");
+    [RLog v:self Message:@"Message"];
 }
 
 @end

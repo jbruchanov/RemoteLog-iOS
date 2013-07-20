@@ -1,5 +1,5 @@
 //
-//  remotelog.h
+//  LogItemBlob.h
 //  remotelog
 //
 //  Created by Joe Scurab on 7/20/13.
@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface remotelog : NSObject
+@interface LogItemBlob : NSObject
+
+@property (nonatomic, strong) NSData* Data;
+@property (nonatomic) int BlobID;
 
 @end
