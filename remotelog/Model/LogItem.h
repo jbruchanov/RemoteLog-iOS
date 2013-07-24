@@ -7,8 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "JSONSerializable.h"
 
-@interface LogItem : NSObject
+@interface LogItem : JSONSerializable
 
 @property (nonatomic) int LogItemID;
 @property (nonatomic, strong) NSString* Application;

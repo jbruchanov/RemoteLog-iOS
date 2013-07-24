@@ -7,11 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "JSONSerializable.h"
 
-@interface Device : NSObject
+@interface Device : JSONSerializable
+
+/* Same property names for JSON */
 
 @property (nonatomic) int DeviceID;
-@property (nonatomic, strong) NSString* DeviceUUID;
+@property (nonatomic, strong) NSString* DevUUID;
 @property (nonatomic, strong) NSString* Brand;
 @property (nonatomic, strong) NSString* Platform;
 @property (nonatomic, strong) NSString* Version;
@@ -24,5 +27,8 @@
 @property (nonatomic, strong) NSString* Model;
 @property (nonatomic, strong) NSString* App;
 @property (nonatomic, strong) NSString* AppVersion;
+
+
++(Device*) deviceWithExampleValues;
 
 @end

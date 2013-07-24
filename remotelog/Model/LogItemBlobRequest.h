@@ -8,13 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import "LogItemBlob.h"
+#import "JSONSerializable.h"
 
 #define MIME_TEXT_PLAIN "text/plain"
 #define MIME_TEXT_JSON "text/json"
 #define MIME_IMAGE_JPEG "image/jpeg"
 #define MIME_IMAGE_PNG "image/png"
+#pragma mark -
 
-@interface LogItemBlobRequest : NSObject
+@interface LogItemBlobRequest : JSONSerializable
 
 @property (nonatomic) int LogItemID;
 @property (nonatomic, strong) NSString *MimeType;

@@ -7,11 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "JSONSerializable.h"
 
-@interface Response : NSObject
+@interface Response : JSONSerializable
 
 @property (nonatomic, strong, readonly) NSString* Type;
 @property (nonatomic, strong, readonly) NSString* Message;
 @property (nonatomic, strong, readonly) id Context;
 @property (nonatomic, readonly) int Count;
+@property (nonatomic, readonly) BOOL HasError;
+
++(Response*) responseFromJson:(NSDictionary*) jsonDict;
 @end
