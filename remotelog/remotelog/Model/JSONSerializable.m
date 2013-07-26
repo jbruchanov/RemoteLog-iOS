@@ -22,6 +22,10 @@
         objc_property_t property = propertyArray[i];
         
         NSString *name = [[NSString alloc] initWithUTF8String:property_getName(property)];
+        
+        if(![self isFieldSerializable:name]){
+            continue;
+        }
 //        NSString *attributesString = [[NSString alloc] initWithUTF8String:property_getAttributes(property)];
         id value = [((id)self) valueForKey:name];
         
@@ -35,11 +39,15 @@
     }
     free(propertyArray);
     
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
 #ifdef DEBUG
     NSLog(@"%@", [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]);
 #endif
     return jsonData;
+}
+
+-(BOOL) isFieldSerializable:(NSString*) fieldName{
+    return YES;
 }
 
 @end

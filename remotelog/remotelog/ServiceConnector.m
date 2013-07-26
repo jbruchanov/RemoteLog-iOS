@@ -8,6 +8,7 @@
 
 #import "ServiceConnector.h"
 #import "Response.h"
+#import "LogItemBlobRequest.h"
 
 #pragma mark -
 #define REGS_URL @"/regs"
@@ -57,20 +58,25 @@ const double kDefaultTimeout = 2.0;
 #pragma mark Public
 
 -(Response*) saveDevice:(Device*) device{
-    NSData *data = [device toJson];
+    return [self sendJSONSerializable:device toUrl:[self.baseUrl stringByAppendingString:REGS_URL]];
+}
+
+-(Response*) saveLogItem:(LogItem*) logItem{
+    return [self sendJSONSerializable:logItem toUrl:[self.baseUrl stringByAppendingString:LOGS_URL]];
+}
+
+-(Response*) sendJSONSerializable:(JSONSerializable*) object toUrl:(NSString*)url{
+    NSData *data = [object toJson];
 #ifdef DEBUG
     NSLog(@"%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif
     
-    Response *r = [self sendRequest:[self createRequest:[self.baseUrl stringByAppendingString:REGS_URL] withMethod:HTTP_POST withData:data]];
+    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_POST withData:data]];
     return r;
 }
 
--(Response*) saveLogItem:(LogItem*) logItem{
-    return nil;
-}
-
--(Response*) saveLogItemBlob:(LogItemBlob*) logItemBlob{
+-(Response*) saveLogItemBlob:(LogItemBlobRequest*) request{
+    
     return nil;
 }
 

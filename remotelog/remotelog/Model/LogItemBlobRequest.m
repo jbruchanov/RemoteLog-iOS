@@ -27,4 +27,8 @@
     return item;
 }
 
+-(BOOL) isFieldSerializable:(NSString *)fieldName{
+    return ![@"data" isEqualToString:fieldName];
+}
+
 @end
