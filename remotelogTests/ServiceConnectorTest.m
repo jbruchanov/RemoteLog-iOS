@@ -53,6 +53,7 @@
 }
 
 -(void) testSaveLogItemBlobText{
+    return;
     ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
     LogItem *li = [LogItem logItemWithSampleData:7007];
     Response *r = [sc saveLogItem:li];
@@ -68,6 +69,38 @@
     
     LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"text/plain"];
     req.FileName = @"test.txt";
+    req.LogItemID = [[r.Context objectForKey:@"ID"] integerValue];
+    
+    r = [sc saveLogItem:req forBlob:lib.Data];
+    
+    if(r.HasError){
+        NSLog(@"%@", r.Message);
+    }
+    STAssertEquals(NO, r.HasError, @"Shouldn't have error!");
+}
+
+-(void) testSaveLogItemBlobImage{
+    NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"ios-logo" ofType:@"jpg"];
+    if(!filePath){
+        STFail(@"image not found");
+    }
+    NSData *jpegData = [NSData dataWithContentsOfFile:filePath];
+    
+    ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
+    LogItem *li = [LogItem logItemWithSampleData:7007];
+    Response *r = [sc saveLogItem:li];
+    if(r.HasError){
+        NSLog(@"%@", r.Message);
+    }
+    
+    STAssertEquals(NO, r.HasError, @"Shouldn't have error!");
+   
+    LogItemBlob *lib = [LogItemBlob new];
+    //create sample image
+    lib.Data = jpegData;
+    
+    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"image/jpeg"];
+    req.FileName = @"test.png";
     req.LogItemID = [[r.Context objectForKey:@"ID"] integerValue];
     
     r = [sc saveLogItem:req forBlob:lib.Data];
