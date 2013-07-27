@@ -46,6 +46,10 @@
     return jsonData;
 }
 
+-(NSString*) toJsonString{
+    return [[NSString alloc]initWithData:[self toJson] encoding:NSUTF8StringEncoding];
+}
+
 -(BOOL) isFieldSerializable:(NSString*) fieldName{
     return YES;
 }

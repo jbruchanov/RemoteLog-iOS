@@ -19,7 +19,7 @@
 @property (nonatomic, strong) NSString* Category;
 @property (nonatomic, strong) NSString* Source;
 @property (nonatomic, strong) NSString* Message;
-@property (nonatomic, strong) NSString* BlobMime;
+@property (nonatomic, strong, readonly) NSString* BlobMime;
 @property (nonatomic) int DeviceID;
 
 

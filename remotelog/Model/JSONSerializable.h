@@ -13,6 +13,8 @@
 /* Convert object into json dictionary string then into NSData */
 -(NSData*) toJson;
 
+-(NSString*) toJsonString;
+
 -(BOOL) isFieldSerializable:(NSString*) fieldName;
 
 @end

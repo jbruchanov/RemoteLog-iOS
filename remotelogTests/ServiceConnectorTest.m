@@ -23,6 +23,7 @@
 }
 
 -(void) testSaveLogItem{
+    return;
     ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
     LogItem *li = [LogItem logItemWithSampleData:7007];
    
@@ -51,11 +52,9 @@
     
 }
 
--(void) testSaveLogItemBlob{
-    return;
+-(void) testSaveLogItemBlobText{
     ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
     LogItem *li = [LogItem logItemWithSampleData:7007];
-    li.BlobMime = @"text/plain";
     Response *r = [sc saveLogItem:li];
     if(r.HasError){
         NSLog(@"%@", r.Message);
@@ -65,12 +64,13 @@
     
     LogItemBlob *lib = [LogItemBlob new];
     
-    lib.Data = [@"TestData\nblablabla" dataUsingEncoding:NSUTF8StringEncoding];
+    lib.Data = [@"TestData\nblablabla\nNejžluťoučký koníček\něščřžýáíéťďňůú" dataUsingEncoding:NSUTF8StringEncoding];
     
-    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:li.BlobMime];
+    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"text/plain"];
     req.FileName = @"test.txt";
+    req.LogItemID = [[r.Context objectForKey:@"ID"] integerValue];
     
-    r = [sc saveLogItemBlob:lib];
+    r = [sc saveLogItem:req forBlob:lib.Data];
     
     if(r.HasError){
         NSLog(@"%@", r.Message);

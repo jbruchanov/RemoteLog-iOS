@@ -9,6 +9,7 @@
 #import "ServiceConnector.h"
 #import "Response.h"
 #import "LogItemBlobRequest.h"
+#import "NSString+URLEncoding.h"
 
 #pragma mark -
 #define REGS_URL @"/regs"
@@ -57,27 +58,31 @@ const double kDefaultTimeout = 2.0;
 
 #pragma mark Public
 
+/* 
+ Save Device
+ */
 -(Response*) saveDevice:(Device*) device{
     return [self sendJSONSerializable:device toUrl:[self.baseUrl stringByAppendingString:REGS_URL]];
 }
 
+/*
+ Save logItem
+*/
 -(Response*) saveLogItem:(LogItem*) logItem{
     return [self sendJSONSerializable:logItem toUrl:[self.baseUrl stringByAppendingString:LOGS_URL]];
 }
 
--(Response*) sendJSONSerializable:(JSONSerializable*) object toUrl:(NSString*)url{
-    NSData *data = [object toJson];
+/*
+ Save blob
+*/
+-(Response*) saveLogItem:(LogItemBlobRequest*) request forBlob:(NSData*)blob{
+    NSString *req = [[request toJsonString] urlEncode];
+    NSString *url = [NSString stringWithFormat:@"%@%@?%@", self.baseUrl,LOGS_URL,req];
 #ifdef DEBUG
-    NSLog(@"%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    NSLog(@"%@",url);
 #endif
-    
-    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_POST withData:data]];
+    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_PUT forContentType:request.MimeType withData:blob]];
     return r;
-}
-
--(Response*) saveLogItemBlob:(LogItemBlobRequest*) request{
-    
-    return nil;
 }
 
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName{
@@ -90,12 +95,22 @@ const double kDefaultTimeout = 2.0;
 
 #pragma mark private
 
--(NSURLRequest*) createRequest:(NSString*) url withMethod:(NSString*) method withData:(NSData*) data{
+-(Response*) sendJSONSerializable:(JSONSerializable*) object toUrl:(NSString*)url{
+    NSData *data = [object toJson];
+#ifdef DEBUG
+    NSLog(@"%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+#endif
+    
+    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_POST forContentType:kContentTypeValue withData:data]];
+    return r;
+}
+
+-(NSURLRequest*) createRequest:(NSString*) url withMethod:(NSString*) method forContentType:(NSString*) type withData:(NSData*) data{
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]
                                                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                             timeoutInterval:kDefaultTimeout];
     [request setHTTPMethod:method];
-    [request setValue:kContentTypeValue forHTTPHeaderField: kContentType];
+    [request setValue:type forHTTPHeaderField: kContentType];
     [request setValue:[NSString stringWithFormat:@"%d", [data length]] forHTTPHeaderField:kContentLen];
     [request setHTTPBody:data];
     return request;

@@ -10,6 +10,10 @@
 
 #define kDateTimeFormat @"yyyy-MM-dd HH:mm:ss.SSS"
 
+@interface LogItem()
+@property (nonatomic, strong, readwrite) NSString* BlobMime;
+@end
+
 @implementation LogItem
 
 

@@ -10,7 +10,7 @@
 #import "Response.h"
 #import "Device.h"
 #import "LogItem.h"
-#import "LogItemBlob.h"
+#import "LogItemBlobRequest.h"
 
 @interface ServiceConnector : NSObject
 
@@ -23,7 +23,7 @@
 -(Response*) saveLogItem:(LogItem*) logItem;
 
 /* Send blob item related to logitem */
--(Response*) saveLogItemBlob:(LogItemBlob*) logItemBlob;
+-(Response*) saveLogItem:(LogItemBlobRequest*) request forBlob:(NSData*)blob;
 
 /* Load set of settings for device */
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName;

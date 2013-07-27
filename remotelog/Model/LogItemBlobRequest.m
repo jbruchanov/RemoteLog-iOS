@@ -23,6 +23,7 @@
         item = [[LogItemBlobRequest alloc] init];
         item.data = data;
         item.DataLength = [data.Data length];
+        item.MimeType = mimeType;
     }
     return item;
 }
