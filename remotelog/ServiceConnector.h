@@ -29,6 +29,6 @@
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName;
 
 /* Update token for push notifications */
--(void) updatePushToken:(NSString*) token;
+-(Response*) updatePushToken:(NSString*) token forDeviceID:(int)deviceId;
 
 @end

@@ -113,11 +113,23 @@
 }
 
 -(void)testLoadSettings{
+    return;
     ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
     Response *r = [sc loadSettings:7007 forApp:@"RemoteLog-iOS"];
     
     STAssertNotNil(r, @"Shouldn't be nil");
     STAssertNotNil(r.Context, @"Context shouldn't be nil");
+    if(r.HasError){
+        NSLog(@"%@", r.Message);
+    }
+    STAssertEquals(NO, r.HasError, @"Shouldn't have error!");
+}
+
+-(void) testUpdatePushToken{
+    return;
+    ServiceConnector *sc = [[ServiceConnector alloc]initWithURL:self.serverUrl userName:nil andPassword:nil];
+    Response *r = [sc updatePushToken:@"PushTokenTestBlaBla" forDeviceID:7007];
+    STAssertNotNil(r, @"Shouldn't be nil");
     if(r.HasError){
         NSLog(@"%@", r.Message);
     }

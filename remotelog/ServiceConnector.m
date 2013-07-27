@@ -58,7 +58,7 @@ const double kDefaultTimeout = 2.0;
 
 #pragma mark Public
 
-/* 
+/*
  Save Device
  */
 -(Response*) saveDevice:(Device*) device{
@@ -67,14 +67,14 @@ const double kDefaultTimeout = 2.0;
 
 /*
  Save logItem
-*/
+ */
 -(Response*) saveLogItem:(LogItem*) logItem{
     return [self sendJSONSerializable:logItem toUrl:[self.baseUrl stringByAppendingString:LOGS_URL]];
 }
 
 /*
  Save blob
-*/
+ */
 -(Response*) saveLogItem:(LogItemBlobRequest*) request forBlob:(NSData*)blob{
     NSString *req = [[request toJsonString] urlEncode];
     NSString *url = [NSString stringWithFormat:@"%@%@?%@", self.baseUrl,LOGS_URL,req];
@@ -85,6 +85,9 @@ const double kDefaultTimeout = 2.0;
     return r;
 }
 
+/*
+ Load Settings
+ */
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName{
     NSString *url = [self.baseUrl stringByAppendingFormat:SETTINGS_TEMPLATE_URL, DeviceID, appName];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]
@@ -95,8 +98,16 @@ const double kDefaultTimeout = 2.0;
     return r;
 }
 
--(void) updatePushToken:(NSString*) token{
-    
+/*
+ Update push token
+ */
+-(Response*) updatePushToken:(NSString*) token forDeviceID:(int)deviceId{
+    NSString *url = [self.baseUrl stringByAppendingFormat:@"%@/%d", REGS_URL, deviceId];
+    Response *r = [self sendRequest:[self createUploadRequestForUrl:url
+                                                         withMethod:HTTP_PUT
+                                                     forContentType:kContentTypeValue
+                                                           withData:[token dataUsingEncoding:NSUTF8StringEncoding]]];
+    return r;
 }
 
 #pragma mark private
