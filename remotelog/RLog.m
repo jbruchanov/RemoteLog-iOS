@@ -8,13 +8,10 @@
 
 #import "RLog.h"
 #import "LogItemBlobRequest.h"
+
 @implementation RLog
 static BOOL localMode = NO;
 static int mode = ALL;
-
-static void v(int q){
-    
-}
 
 +(void) n:(id) source Category:(NSString*) category Message:(NSString*)msg{
     [RLog send:source Category:category Message:msg];
@@ -83,7 +80,6 @@ static void v(int q){
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view{
     if ((mode & SCREENSHOT) == SCREENSHOT) {
         NSData *image = [RLog saveViewToJPEG:view];
-
     }
 }
 
