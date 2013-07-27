@@ -14,7 +14,7 @@
 #pragma mark -
 #define REGS_URL @"/regs"
 #define LOGS_URL @"/logs"
-#define SETTINGS_TEMPLATE_URL @"/settings/%s/%s"
+#define SETTINGS_TEMPLATE_URL @"/settings/%d/%@"
 
 #pragma mark -
 #define kContentLen @"Content-length"
@@ -86,7 +86,13 @@ const double kDefaultTimeout = 2.0;
 }
 
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName{
-    return nil;
+    NSString *url = [self.baseUrl stringByAppendingFormat:SETTINGS_TEMPLATE_URL, DeviceID, appName];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]
+                                                                cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                                            timeoutInterval:kDefaultTimeout];
+    [request setHTTPMethod:HTTP_GET];
+    Response *r = [self sendRequest:request];
+    return r;
 }
 
 -(void) updatePushToken:(NSString*) token{
