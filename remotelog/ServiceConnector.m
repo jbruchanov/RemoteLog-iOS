@@ -81,7 +81,7 @@ const double kDefaultTimeout = 2.0;
 #ifdef DEBUG
     NSLog(@"%@",url);
 #endif
-    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_PUT forContentType:request.MimeType withData:blob]];
+    Response *r = [self sendRequest:[self createUploadRequestForUrl:url withMethod:HTTP_PUT forContentType:request.MimeType withData:blob]];
     return r;
 }
 
@@ -101,11 +101,11 @@ const double kDefaultTimeout = 2.0;
     NSLog(@"%@",[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif
     
-    Response *r = [self sendRequest:[self createRequest:url withMethod:HTTP_POST forContentType:kContentTypeValue withData:data]];
+    Response *r = [self sendRequest:[self createUploadRequestForUrl:url withMethod:HTTP_POST forContentType:kContentTypeValue withData:data]];
     return r;
 }
 
--(NSURLRequest*) createRequest:(NSString*) url withMethod:(NSString*) method forContentType:(NSString*) type withData:(NSData*) data{
+-(NSURLRequest*) createUploadRequestForUrl:(NSString*) url withMethod:(NSString*) method forContentType:(NSString*) type withData:(NSData*) data{
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]
                                                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                             timeoutInterval:kDefaultTimeout];
