@@ -21,9 +21,11 @@
 
 @protocol RemoteLogRegistrationDelegate <NSObject>
 
-@optional
+@required
 //-(void) didFinish:(RemoteLog*) remoteLog;
 -(void) didFinish;
+
+@optional
 -(void) didReceiveSettings:(NSDictionary*) settings;
 -(void) didException:(NSError*) error;
 

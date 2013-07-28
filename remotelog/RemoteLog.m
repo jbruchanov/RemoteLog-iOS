@@ -10,6 +10,7 @@
 #import "Device.h"
 #import "ServiceConnector.h"
 #import "RLog.h"
+#import "Settings.h"
 
 #define kDeviceId @"DEVICE_ID"
 #define kRemoteLog @"RemoteLog"
@@ -95,11 +96,9 @@ static NSString *_password;
     
     dispatch_async(dispatch_queue_create(kRemoteLogC, NULL), ^{
         BOOL reged = [RemoteLog sendRegistrationWith:connector withAppName:appName withDelegate:delegate];
-        if(!reged){
-            return;//notification already sent
+        if(reged){
+            [RemoteLog loadSettingsForApp:appName withServiceConnector:connector withDelegate:delegate];
         }
-        
-        [RemoteLog loadSettingsForApp:appName withServiceConnector:connector withDelegate:delegate];
         
         //TODO: push notification!
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -157,24 +156,33 @@ static NSString *_password;
     int devId = [_userDefaults integerForKey:kDeviceId];
     
     Response *resp = [connector loadSettings:devId forApp:appName];
-    NSDictionary *settings = resp.Context;
-    if(settings){
-        id rlog = [settings objectForKey:kSettingsRLog];
-        if(rlog){
-            int parsed = -1;
-            if([rlog isKindOfClass:[NSString class]]){
-                parsed = [RLog settingsValue:(NSString*)rlog];
-            }else if([rlog isKindOfClass:[NSNumber class]]){
-                parsed = [rlog intValue];
-            }else{
-                //something really weird came from server, ignore it...
+    NSArray *settings = [Settings settingsFromJsonArray:resp.Context];
+    if(settings && [settings count] > 0){
+        for(Settings *s in settings){
+            NSDictionary *dict = s.JsonValueDictionary;
+            if(dict){
+                id rlog = [dict objectForKey:kSettingsRLog];
+                if(rlog){
+                    int parsed = -1;
+                    if([rlog isKindOfClass:[NSString class]]){
+                        parsed = [RLog modeWithString:(NSString*)rlog];
+                    }else if([rlog isKindOfClass:[NSNumber class]]){
+                        parsed = [rlog intValue];
+                    }else{
+                        //something really weird came from server, ignore it...
+                    }
+                    if(parsed != -1){
+                        [RLog setMode:parsed];
+                    }
+                }
+                
             }
-            if(parsed != -1){
-                [RLog setMode:parsed];
-            }
+            
         }
         //notify delegate about downloaded settings
-        [delegate didReceiveSettings:settings];
+        if(delegate && [delegate respondsToSelector:@selector(didReceiveSettings:)]){
+            [delegate didReceiveSettings:nil];
+        }
     }
 }
 
@@ -184,15 +192,17 @@ static NSString *_password;
 +(void)notifyAboutError:(NSError*) err withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     if(delegate){
         if([NSThread isMainThread]){
-            if(delegate){
+            if(delegate && [delegate respondsToSelector:@selector(didException:)]){
                 [delegate didException: err];
             }
+            [delegate didFinish];
             _isRunning = NO;
         }else{
             dispatch_async(dispatch_get_main_queue(), ^{
-                if(delegate){
+                if(delegate && [delegate respondsToSelector:@selector(didException:)]){
                     [delegate didException: err];
                 }
+                [delegate didFinish];
                 _isRunning = NO;
             });
         }

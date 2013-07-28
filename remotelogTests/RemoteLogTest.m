@@ -9,18 +9,32 @@
 #import "RemoteLogTest.h"
 #import "RemoteLog.h"
 #import <UIKit/UIKit.h>
+@interface RemoteLogTest() <RemoteLogRegistrationDelegate>
+
+@end
 
 @implementation RemoteLogTest
-static BOOL finalResult = NO;
+static BOOL _finalResult = NO;
+static BOOL _hasError = NO;
 -(void) setUp{
-    finalResult = NO;
+    [super setUp];
+    _finalResult = NO;
+    _hasError = NO;
 }
 
 -(void) testBaseInit{
-//    [RemoteLog startWithAppName:@"RemoteLog-iOS" forServerLocation:self.serverUrl withDelegate:nil];
-//    
-//    [self activeWait:&finalResult];
-//    STAssertEquals(YES, finalResult, @"Should be finished!");
+    [RemoteLog startWithAppName:@"RemoteLog-iOS" forServerLocation:self.serverUrl withDelegate:self];
+    [self activeWait:&_finalResult];
+    STAssertEquals(YES, _finalResult, @"Should be finished!");
+    STAssertEquals(NO, _hasError, @"Shouldn't be any error!");
+}
+
+-(void)didFinish{
+    _finalResult = YES;
+}
+
+-(void)didException:(NSError *)error{
+    _hasError = YES;
 }
 
 -(void) activeWait:(BOOL*) stop{
