@@ -30,4 +30,8 @@
 
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view;
 
++(void) setMode:(int)mode;
+
++(int) settingsValue:(NSString*) value;
+
 @end

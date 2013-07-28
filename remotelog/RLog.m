@@ -10,8 +10,8 @@
 #import "LogItemBlobRequest.h"
 
 @implementation RLog
-static BOOL localMode = NO;
-static int mode = ALL;
+static BOOL _local_mode = NO;
+static int _mode = ALL;
 
 +(void) n:(id) source Category:(NSString*) category Message:(NSString*)msg{
     [RLog send:source Category:category Message:msg];
@@ -22,7 +22,7 @@ static int mode = ALL;
 }
 
 +(void) i:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & INFO) == INFO) {
+    if ((_mode & INFO) == INFO) {
         [RLog send:source Category:category Message:msg];
     }
 }
@@ -32,7 +32,7 @@ static int mode = ALL;
 }
 
 +(void) d:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & DEBUG) == DEBUG) {
+    if ((_mode & DEBUG) == DEBUG) {
         [RLog send:source Category:category Message:msg];
     }
 }
@@ -42,7 +42,7 @@ static int mode = ALL;
 }
 
 +(void) e:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & ERROR) == ERROR) {
+    if ((_mode & ERROR) == ERROR) {
         [RLog send:source Category:category Message:msg];
     }
 }
@@ -52,7 +52,7 @@ static int mode = ALL;
 }
 
 +(void) v:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & VERBOSE) == VERBOSE) {
+    if ((_mode & VERBOSE) == VERBOSE) {
         [RLog send:source Category:category Message:msg];
     }
 }
@@ -62,7 +62,7 @@ static int mode = ALL;
 }
 
 +(void) w:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & WARNING) == WARNING) {
+    if ((_mode & WARNING) == WARNING) {
         [RLog send:source Category:category Message:msg];
     }
 }
@@ -72,13 +72,13 @@ static int mode = ALL;
 }
 
 +(void) wtf:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    if ((mode & WTF) == WTF) {
+    if ((_mode & WTF) == WTF) {
         [RLog send:source Category:category Message:msg];
     }
 }
 
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view{
-    if ((mode & SCREENSHOT) == SCREENSHOT) {
+    if ((_mode & SCREENSHOT) == SCREENSHOT) {
         NSData *image = [RLog saveViewToJPEG:view];
     }
 }
@@ -92,7 +92,7 @@ static int mode = ALL;
 +(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg LogItemBlob:(LogItemBlobRequest*)blobReq{
     NSLog(@"[%@] %@", category, msg);
     NSLog(@"%@",[NSThread callStackSymbols]);
-    if(localMode || mode == TURN_OFF){
+    if(_local_mode || _mode == TURN_OFF){
         return;
     }
 }
@@ -106,6 +106,14 @@ static int mode = ALL;
     UIGraphicsEndImageContext();
     NSData* imgData = UIImageJPEGRepresentation(image, 80);
     return imgData;
+}
+
++(void) setMode:(int)mode{
+    _mode = mode;
+}
+
++(int) settingsValue:(NSString*) value{
+    return -1;
 }
 
 @end
