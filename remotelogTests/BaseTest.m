@@ -7,6 +7,7 @@
 //
 
 #import "BaseTest.h"
+#define RUNNING_TEST
 
 @interface BaseTest()
 

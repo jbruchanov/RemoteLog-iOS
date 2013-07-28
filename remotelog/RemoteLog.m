@@ -171,26 +171,54 @@ static NSString *_password;
             if(dict){
                 id rlog = [dict objectForKey:kSettingsRLog];
                 if(rlog){
-                    int parsed = -1;
-                    if([rlog isKindOfClass:[NSString class]]){
-                        parsed = [RLog modeWithString:(NSString*)rlog];
-                    }else if([rlog isKindOfClass:[NSNumber class]]){
-                        parsed = [rlog intValue];
-                    }else{
-                        //something really weird came from server, ignore it...
-                    }
-                    if(parsed != -1){
-                        [RLog setMode:parsed];
-                    }
+                    [RemoteLog didReceiveRLogSettings:rlog];
                 }
                 
+                NSDictionary *update = [dict objectForKey:kSettingsUpdate];
+                if(update){
+                    [RemoteLog didReceiveUpdateNofication:[Update updateFromJson:update]];
+                }
             }
-            
         }
         //notify delegate about downloaded settings
         if(delegate && [delegate respondsToSelector:@selector(didReceiveSettings:)]){
             [delegate didReceiveSettings:nil];
         }
+    }
+}
+
++(void)didReceiveRLogSettings:(id)rlog{
+    int parsed = -1;
+    if([rlog isKindOfClass:[NSString class]]){
+        parsed = [RLog modeWithString:(NSString*)rlog];
+    }else if([rlog isKindOfClass:[NSNumber class]]){
+        parsed = [rlog intValue];
+    }else{
+        //something really weird came from server, ignore it...
+    }
+    
+    if(parsed != -1){
+        [RLog setMode:parsed];
+    }
+}
+
++(void)didReceiveUpdateNofication:(Update*)value{
+    NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
+    NSString *appBuild = [bundle valueForKey:@"CFBundleVersion"];
+    NSString *newBuild = value.Build;
+    if([newBuild floatValue] > [appBuild floatValue]){
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(value.Type == Dialog){
+                [[[UIAlertView alloc]initWithTitle:NSLocalizedString(@"Update", @"Update")
+                                           message:value.Message
+                                          delegate:nil
+                                 cancelButtonTitle:NSLocalizedString(@"OK", @"OK")
+                                 otherButtonTitles: nil] show];
+                
+            }else if(value.Type == Toast){
+                //TODO: toast notification about update
+            }
+        });
     }
 }
 
