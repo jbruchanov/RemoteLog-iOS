@@ -29,4 +29,20 @@
     }
 }
 
+-(void) testDictionary{
+    NSData *json = [@"{\"Test\":1}" dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *data = [NSJSONSerialization JSONObjectWithData:json options:0 error:nil];
+    
+    id v = [data objectForKey:@"Test"];
+    int q = [v intValue];
+    STAssertEquals(1, q, @"");
+    STAssertTrue([v isKindOfClass:[NSNumber class]], @"");
+    
+    json = [@"{\"Test\":\"1\"}" dataUsingEncoding:NSUTF8StringEncoding];
+    data = [NSJSONSerialization JSONObjectWithData:json options:0 error:nil];
+    
+    v = [data objectForKey:@"Test"];
+    STAssertTrue([v isKindOfClass:[NSString class]], @"");
+}
+
 @end
