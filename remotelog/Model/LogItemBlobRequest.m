@@ -9,7 +9,7 @@
 #import "LogItemBlobRequest.h"
 @interface LogItemBlobRequest()
 
-@property (nonatomic, strong) LogItemBlob *data;
+@property (nonatomic, strong) NSData *data;
 @property (nonatomic, readwrite) int DataLength;
 
 @end
@@ -17,12 +17,12 @@
 @implementation LogItemBlobRequest
 
 
-+(LogItemBlobRequest*) requestWith:(LogItemBlob*) data ForType:(NSString*) mimeType{
++(LogItemBlobRequest*) requestForData:(NSData*) data ForType:(NSString*) mimeType{
     LogItemBlobRequest *item;
     if(data){
         item = [[LogItemBlobRequest alloc] init];
         item.data = data;
-        item.DataLength = [data.Data length];
+        item.DataLength = [data length];
         item.MimeType = mimeType;
     }
     return item;

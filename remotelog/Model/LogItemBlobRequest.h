@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "LogItemBlob.h"
 #import "JSONSerializable.h"
 
 #define MIME_TEXT_PLAIN "text/plain"
@@ -23,7 +22,7 @@
 @property (nonatomic, readonly) int DataLength;
 @property (nonatomic, strong) NSString *FileName;
 
-+(LogItemBlobRequest*) requestWith:(LogItemBlob*) blob ForType:(NSString*) mimeType;
++(LogItemBlobRequest*) requestForData:(NSData*) data ForType:(NSString*) mimeType;
 
 @end
 
