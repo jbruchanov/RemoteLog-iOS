@@ -22,9 +22,9 @@
     item.Application = @"RemoteLog-iOS";
     item.AppVersion = @"0.0.1";
     item.AppBuild = @"1";
-
+    
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
-    [format setDateFormat:kDateTimeFormat];    
+    [format setDateFormat:kDateTimeFormat];
     item.Date = [format stringFromDate:[NSDate date]];
     item.Category = @"TestCategory";
     item.Source = @"ServiceConnectorTest";
@@ -32,5 +32,19 @@
     item.DeviceID = DeviceID;
     
     return item;
+}
+
+- (id)copyWithZone:(NSZone *)zone{
+    LogItem *li = [[self class] allocWithZone:zone];
+    li.LogItemID = self.LogItemID;
+    if(self.Application) li.Application = [NSString stringWithString:self.Application];
+    if(self.AppVersion) li.AppVersion = [NSString stringWithString:self.AppVersion];
+    if(self.AppBuild) li.AppBuild = [NSString stringWithString:self.AppBuild];
+    if(self.Date) li.Date = [NSString stringWithString:self.Date];
+    if(self.Category) li.Category = [NSString stringWithString:self.Category];
+    if(self.Source) li.Source = [NSString stringWithString:self.Source];
+    if(self.Message) li.Message = [NSString stringWithString:self.Message];
+    if(self.BlobMime) li.BlobMime = [NSString stringWithString:self.BlobMime];
+    li.DeviceID = [NSString stringWithString:self.DeviceID];
 }
 @end
