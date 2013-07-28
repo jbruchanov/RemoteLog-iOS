@@ -34,4 +34,6 @@
 
 +(int) settingsValue:(NSString*) value;
 
++(int) modeWithString:(NSString*)mode;
+
 @end

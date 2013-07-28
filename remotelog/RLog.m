@@ -9,6 +9,8 @@
 #import "RLog.h"
 #import "LogItemBlobRequest.h"
 
+#define SEPARATOR @"|"
+
 @implementation RLog
 static BOOL _local_mode = NO;
 static int _mode = ALL;
@@ -114,6 +116,62 @@ static int _mode = ALL;
 
 +(int) settingsValue:(NSString*) value{
     return -1;
+}
+
+#pragma mark parsing
+
+/*
+  parse String into numeric value
+  @param mode can be one or multiple values separeted by '|' (e.g. "ALL" or "WTF|INFO")
+  @return value if it's valid, otherwise -1
+ */
++(int) modeWithString:(NSString*)mode{
+    int result = 0;
+    BOOL found = NO;
+    
+    if(mode){
+        NSCharacterSet *whiteSpaces = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+        mode = [mode stringByTrimmingCharactersInSet:whiteSpaces];
+        NSArray *values = [mode componentsSeparatedByString:SEPARATOR];
+        for(NSString *value in values){
+            NSString *v = [value stringByTrimmingCharactersInSet:whiteSpaces];
+            int parsedValue = [RLog getModeValue:v];
+            if(parsedValue >= TURN_OFF && parsedValue <= (ALL)){
+                found = YES;
+                result |= parsedValue;
+            }
+        }
+    }
+    return found ? result : -1;
+}
+
+/*
+ parse string value into numeric one
+ */
++(int) getModeValue:(NSString*) value {
+    int result = -1;
+    if ([@"TURN_OFF" isEqualToString:value]) {
+        return TURN_OFF;
+    } else if ([@"INFO" isEqualToString:value]) {
+        return INFO;
+    } else if ([@"VERBOSE" isEqualToString:value]) {
+        return VERBOSE;
+    } else if ([@"DEBUG" isEqualToString:value]) {
+        return DEBUGG;
+    } else if ([@"WARNING" isEqualToString:value]) {
+        return TURN_OFF;
+    } else if ([@"ERROR" isEqualToString:value]) {
+        return ERROR;
+    } else if ([@"EXCEPTION" isEqualToString:value]) {
+        return EXCEPTION;
+    } else if ([@"WTF" isEqualToString:value]) {
+        return WTF;
+    } else if ([@"SCREENSHOT" isEqualToString:value]) {
+        return SCREENSHOT;
+    } else if ([@"ALL" isEqualToString:value]) {
+        return ALL;
+    }
+    return result;
 }
 
 @end
