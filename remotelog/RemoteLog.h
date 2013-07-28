@@ -9,16 +9,35 @@
 #import <Foundation/Foundation.h>
 
 #define kErrorRegistrationAlreadyStarted 1
+#define kErrorIncompleteCredentials 2
+#define kErrorMissingAppName 3
+#define kErrorMissingServerLocation 4
+#define kErrorUnableToSendRegistration 4
+#define kErrorRegistrationError 5
+
+#define kResponse @"Response"
+
+@class RemoteLog;
+
+@protocol RemoteLogRegistrationDelegate <NSObject>
+
+@optional
+//-(void) didFinish:(RemoteLog*) remoteLog;
+-(void) didFinish;
+-(void) didReceiveSettings:(NSDictionary*) settings;
+-(void) didException:(NSError*) error;
+
+@end
 
 @interface RemoteLog : NSObject
 
 /*
-  Initialize registration
+ Initialize registration
  */
 +(void)startWithAppName:(NSString*)appName
-   forServerLocation:(NSString*)serverLocation
-  withFinishCallback:(void (^)(RemoteLog*, NSError*))callback; /*optional*/
-    
+      forServerLocation:(NSString*)serverLocation
+           withDelegate:(id<RemoteLogRegistrationDelegate>) delegate; /*optional*/
+
 /*
  Get singleton instance of RemoteLog
  */
@@ -28,5 +47,10 @@
  Release anything related with RemoteLog
  */
 +(void)release;
+
+/*
+ Set custom owner for Device
+ */
++(void)setOwner:(NSString*) owner;
 
 @end
