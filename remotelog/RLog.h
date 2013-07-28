@@ -32,8 +32,6 @@
 
 +(void) setMode:(int)mode;
 
-+(int) settingsValue:(NSString*) value;
-
 +(int) modeWithString:(NSString*)mode;
 
 @end

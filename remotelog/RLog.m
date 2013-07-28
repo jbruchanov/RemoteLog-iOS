@@ -12,6 +12,7 @@
 #define SEPARATOR @"|"
 
 @implementation RLog
+
 static BOOL _local_mode = NO;
 static int _mode = ALL;
 
@@ -112,10 +113,6 @@ static int _mode = ALL;
 
 +(void) setMode:(int)mode{
     _mode = mode;
-}
-
-+(int) settingsValue:(NSString*) value{
-    return -1;
 }
 
 #pragma mark parsing
