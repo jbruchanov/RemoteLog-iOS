@@ -30,5 +30,6 @@
 
 
 +(Device*) deviceWithExampleValues;
++(Device*) deviceWithRealValues;
 
 @end

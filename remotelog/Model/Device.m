@@ -32,4 +32,39 @@
     return d;
 }
 
++(Device*) deviceWithRealValues{
+    Device *d = [[Device alloc ]init];
+    UIDevice *udev = [UIDevice currentDevice];
+    UIScreen *screen = [UIScreen mainScreen];
+    CGRect bounds = screen.bounds;
+    int h = (int)(MAX(bounds.size.height, bounds.size.width) * screen.scale);
+    int w = (int)(MIN(bounds.size.height, bounds.size.width) * screen.scale);
+
+    d.Brand = @"Apple";
+    d.Platform = udev.systemName;
+    d.DevUUID = [udev uniqueIdentifier];
+    d.OSDescription = udev.name;
+    d.Model = udev.model;
+    d.Resolution = [NSString stringWithFormat:@"%dx%d", w, h];
+    d.Version = udev.systemVersion;
+    
+    //add details
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
+    [dict setObject:[Device translate:udev.userInterfaceIdiom] forKey:@"InterfaceIdiom"];
+    d.Detail = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:dict options:0 error:nil] encoding:NSUTF8StringEncoding];
+        
+    return d;
+}
+
++(NSString*) translate:(UIUserInterfaceIdiom)idiom{
+    switch (idiom) {
+        case UIUserInterfaceIdiomPad:
+            return @"UIUserInterfaceIdiomPad";
+        case UIUserInterfaceIdiomPhone:
+            return @"UIUserInterfaceIdiomPhone";
+        default:
+            return [NSString stringWithFormat:@"Unknown: %d", idiom];
+    }
+}
+
 @end
