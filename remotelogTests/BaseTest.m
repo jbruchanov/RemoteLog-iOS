@@ -17,6 +17,7 @@
 @implementation BaseTest
 
 -(void) setUp{
+    [super setUp];
     NSBundle *bundle =  [NSBundle bundleForClass:[self class]];
     NSString *filePath = [bundle pathForResource:@"PrivateSettings" ofType:@"plist"];
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:filePath];
