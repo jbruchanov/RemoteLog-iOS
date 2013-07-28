@@ -11,12 +11,14 @@
 #import "ServiceConnector.h"
 #import "RLog.h"
 #import "Settings.h"
+#import "Update.h"
 
 #define kDeviceId @"DEVICE_ID"
 #define kRemoteLog @"RemoteLog"
 #define kRemoteLogC "RemoteLog"
 
 #define kSettingsRLog @"RLog"
+#define kSettingsUpdate @"Update"
 
 #pragma mark static variables
 /* Singleton instance variable */
@@ -62,29 +64,27 @@ static NSString *_password;
       forServerLocation:(NSString*)serverLocation
            withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     
-    NSError *err;
-    
     //value precheck
     if(_isRunning){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorRegistrationAlreadyStarted userInfo:nil]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorRegistrationAlreadyStarted userInfo:nil]
                        withDelegate:delegate];
         return;
     }
     
     if((_userName && !_password) || (_password && !_userName)){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorIncompleteCredentials userInfo:nil]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorIncompleteCredentials userInfo:nil]
                        withDelegate:delegate];
         return;
     }
     
     if(!appName){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorMissingAppName userInfo:nil]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorMissingAppName userInfo:nil]
                        withDelegate:delegate];
         return;
     }
     
     if(!serverLocation){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorMissingServerLocation userInfo:nil]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorMissingServerLocation userInfo:nil]
                        withDelegate:delegate];
         return;
     }
@@ -95,9 +95,18 @@ static NSString *_password;
     ServiceConnector *connector = [[ServiceConnector alloc]initWithURL:serverLocation userName:nil andPassword:nil];
     
     dispatch_async(dispatch_queue_create(kRemoteLogC, NULL), ^{
-        BOOL reged = [RemoteLog sendRegistrationWith:connector withAppName:appName withDelegate:delegate];
-        if(reged){
-            [RemoteLog loadSettingsForApp:appName withServiceConnector:connector withDelegate:delegate];
+        @try {
+            BOOL reged = [RemoteLog sendRegistrationWith:connector withAppName:appName withDelegate:delegate];
+            if(reged){
+                [RemoteLog loadSettingsForApp:appName withServiceConnector:connector withDelegate:delegate];
+            }
+        }
+        @catch (NSException *exception) {
+            NSLog(@"%@", exception);
+            [delegate didException:exception];
+        }
+        @finally {
+            //do nothing here
         }
         
         //TODO: push notification!
@@ -118,8 +127,7 @@ static NSString *_password;
                withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     
     NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
-    NSString *appVersion = [bundle valueForKey:@"CFBundleVersion"];
-    //    NSString *appBuild = [bundle valueForKey:@"CFBundleShortVersionString"];
+    NSString *appVersion = [bundle valueForKey:@"CFBundleShortVersionString"];
     NSInteger deviceId = [_userDefaults integerForKey:kDeviceId];
     
     Device *dev = [Device deviceWithRealValues];
@@ -132,7 +140,7 @@ static NSString *_password;
     Response *r = [conector saveDevice:dev];
     //check responses
     if(!r){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorUnableToSendRegistration userInfo:nil]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorUnableToSendRegistration userInfo:nil]
                        withDelegate:delegate];
         return NO;
     }
@@ -140,7 +148,7 @@ static NSString *_password;
     int serverDeviceId = r.HasError ? 0 : [[r.Context objectForKey:@"DeviceID"] intValue];
     
     if(r.HasError || serverDeviceId == 0){
-        [RemoteLog notifyAboutError:[[NSError alloc]initWithDomain:kRemoteLog code:kErrorRegistrationError userInfo:@{kResponse: r}]
+        [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorRegistrationError userInfo:@{kResponse: r}]
                        withDelegate:delegate];
         return NO;
     }
@@ -189,7 +197,7 @@ static NSString *_password;
 /*
  Send notification about error in main thread
  */
-+(void)notifyAboutError:(NSError*) err withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
++(void)notifyAboutError:(NSException*) err withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     if(delegate){
         if([NSThread isMainThread]){
             if(delegate && [delegate respondsToSelector:@selector(didException:)]){

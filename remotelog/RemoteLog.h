@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-#define kErrorRegistrationAlreadyStarted 1
-#define kErrorIncompleteCredentials 2
-#define kErrorMissingAppName 3
-#define kErrorMissingServerLocation 4
-#define kErrorUnableToSendRegistration 4
-#define kErrorRegistrationError 5
+#define kErrorRegistrationAlreadyStarted @"RegistrationAlreadyStarted"
+#define kErrorIncompleteCredentials @"IncompleteCredentials"
+#define kErrorMissingAppName @"MissingAppName"
+#define kErrorMissingServerLocation @"MissingServerLocation"
+#define kErrorUnableToSendRegistration @"UnableToSendRegistration"
+#define kErrorRegistrationError @"RgistrationError"
 
 #define kResponse @"Response"
 
@@ -27,7 +27,7 @@
 
 @optional
 -(void) didReceiveSettings:(NSDictionary*) settings;
--(void) didException:(NSError*) error;
+-(void) didException:(NSException*) exception;
 
 @end
 
