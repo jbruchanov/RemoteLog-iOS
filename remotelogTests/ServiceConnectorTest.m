@@ -36,11 +36,11 @@
 
 -(void)testLogItemBlobRequestToJson{
     return;
-    LogItemBlob *lib = [LogItemBlob new];
+
     
-    lib.Data = [@"TestData\nblablabla" dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [@"TestData\nblablabla" dataUsingEncoding:NSUTF8StringEncoding];
     
-    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"text/plain"];
+    LogItemBlobRequest *req = [LogItemBlobRequest requestForData:data ForType:@"text/plain"];
     req.LogItemID = 7007;
     req.FileName = @"test.txt";
     
@@ -62,16 +62,14 @@
     }
     
     STAssertEquals(NO, r.HasError, @"Shouldn't have error!");
+        
+    NSData *data = [@"TestData\nblablabla\nNejžluťoučký koníček\něščřžýáíéťďňůú" dataUsingEncoding:NSUTF8StringEncoding];
     
-    LogItemBlob *lib = [LogItemBlob new];
-    
-    lib.Data = [@"TestData\nblablabla\nNejžluťoučký koníček\něščřžýáíéťďňůú" dataUsingEncoding:NSUTF8StringEncoding];
-    
-    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"text/plain"];
+    LogItemBlobRequest *req = [LogItemBlobRequest requestForData:data ForType:@"text/plain"];
     req.FileName = @"test.txt";
     req.LogItemID = [[r.Context objectForKey:@"ID"] integerValue];
     
-    r = [sc saveLogItem:req forBlob:lib.Data];
+    r = [sc saveLogItemBlob:req];
     
     if(r.HasError){
         NSLog(@"%@", r.Message);
@@ -96,15 +94,15 @@
     
     STAssertEquals(NO, r.HasError, @"Shouldn't have error!");
    
-    LogItemBlob *lib = [LogItemBlob new];
+
     //create sample image
-    lib.Data = jpegData;
+    NSData *data = jpegData;
     
-    LogItemBlobRequest *req = [LogItemBlobRequest requestWith:lib ForType:@"image/jpeg"];
+    LogItemBlobRequest *req = [LogItemBlobRequest requestForData:data ForType:@"image/jpeg"];
     req.FileName = @"test.png";
     req.LogItemID = [[r.Context objectForKey:@"ID"] integerValue];
     
-    r = [sc saveLogItem:req forBlob:lib.Data];
+    r = [sc saveLogItemBlob:req];
     
     if(r.HasError){
         NSLog(@"%@", r.Message);

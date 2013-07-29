@@ -23,7 +23,7 @@
 -(Response*) saveLogItem:(LogItem*) logItem;
 
 /* Send blob item related to logitem */
--(Response*) saveLogItem:(LogItemBlobRequest*) request forBlob:(NSData*)blob;
+-(Response*) saveLogItemBlob:(LogItemBlobRequest*) request;
 
 /* Load set of settings for device */
 -(Response*) loadSettings:(int) DeviceID forApp:(NSString*)appName;

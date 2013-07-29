@@ -75,13 +75,13 @@ const double kDefaultTimeout = 2.0;
 /*
  Save blob
  */
--(Response*) saveLogItem:(LogItemBlobRequest*) request forBlob:(NSData*)blob{
+-(Response*) saveLogItemBlob:(LogItemBlobRequest*) request{
     NSString *req = [[request toJsonString] urlEncode];
     NSString *url = [NSString stringWithFormat:@"%@%@?%@", self.baseUrl,LOGS_URL,req];
 #ifdef DEBUG
     NSLog(@"%@",url);
 #endif
-    Response *r = [self sendRequest:[self createUploadRequestForUrl:url withMethod:HTTP_PUT forContentType:request.MimeType withData:blob]];
+    Response *r = [self sendRequest:[self createUploadRequestForUrl:url withMethod:HTTP_PUT forContentType:request.MimeType withData:request.Data]];
     return r;
 }
 
