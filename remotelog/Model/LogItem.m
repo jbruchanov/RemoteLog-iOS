@@ -45,6 +45,6 @@
     if(self.Source) li.Source = [NSString stringWithString:self.Source];
     if(self.Message) li.Message = [NSString stringWithString:self.Message];
     if(self.BlobMime) li.BlobMime = [NSString stringWithString:self.BlobMime];
-    li.DeviceID = [NSString stringWithString:self.DeviceID];
+    li.DeviceID = self.DeviceID;
 }
 @end
