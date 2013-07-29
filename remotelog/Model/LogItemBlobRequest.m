@@ -9,7 +9,7 @@
 #import "LogItemBlobRequest.h"
 @interface LogItemBlobRequest()
 
-@property (nonatomic, strong) NSData *data;
+@property (nonatomic, strong, readwrite) NSData *Data;
 @property (nonatomic, readwrite) int DataLength;
 
 @end

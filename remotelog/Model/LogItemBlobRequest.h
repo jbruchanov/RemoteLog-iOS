@@ -21,6 +21,7 @@
 @property (nonatomic, strong) NSString *MimeType;
 @property (nonatomic, readonly) int DataLength;
 @property (nonatomic, strong) NSString *FileName;
+@property (nonatomic, strong, readonly) NSData *Data;
 
 +(LogItemBlobRequest*) requestForData:(NSData*) data ForType:(NSString*) mimeType;
 
