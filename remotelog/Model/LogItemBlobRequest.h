@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "JSONSerializable.h"
 
-#define MIME_TEXT_PLAIN "text/plain"
-#define MIME_TEXT_JSON "text/json"
-#define MIME_IMAGE_JPEG "image/jpeg"
-#define MIME_IMAGE_PNG "image/png"
+#define MIME_TEXT_PLAIN @"text/plain"
+#define MIME_TEXT_JSON @"text/json"
+#define MIME_IMAGE_JPEG @"image/jpeg"
+#define MIME_IMAGE_PNG @"image/png"
 #pragma mark -
 
 @interface LogItemBlobRequest : JSONSerializable

@@ -21,7 +21,7 @@
     LogItemBlobRequest *item;
     if(data){
         item = [[LogItemBlobRequest alloc] init];
-        item.data = data;
+        item.Data = data;
         item.DataLength = [data length];
         item.MimeType = mimeType;
     }
@@ -29,7 +29,7 @@
 }
 
 -(BOOL) isFieldSerializable:(NSString *)fieldName{
-    return ![@"data" isEqualToString:fieldName];
+    return ![@"Data" isEqualToString:fieldName];
 }
 
 @end
