@@ -29,7 +29,7 @@
 #define HTTP_PUT @"PUT"
 #pragma mark -
 
-const double kDefaultTimeout = 2.0;
+static const double kDefaultTimeout = 2.0;
 
 @interface ServiceConnector()
 
@@ -112,6 +112,12 @@ const double kDefaultTimeout = 2.0;
 
 #pragma mark private
 
+/*
+ Send object to url, Post method is used 
+ @param object
+ @param url
+ @return
+ */
 -(Response*) sendJSONSerializable:(JSONSerializable*) object toUrl:(NSString*)url{
     NSData *data = [object toJson];
 #ifdef DEBUG
@@ -122,6 +128,14 @@ const double kDefaultTimeout = 2.0;
     return r;
 }
 
+/*
+ Creates generic url request
+ @param url
+ @param method post/put
+ @param type  mime type for data
+ @param data
+ @return 
+*/
 -(NSURLRequest*) createUploadRequestForUrl:(NSString*) url withMethod:(NSString*) method forContentType:(NSString*) type withData:(NSData*) data{
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]
                                                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
@@ -136,6 +150,13 @@ const double kDefaultTimeout = 2.0;
     return request;
 }
 
+/*
+ Send request to server and handle errors
+ 
+ @param request
+ @return nil if there is any kind of error
+ 
+ */
 -(Response*) sendRequest:(NSURLRequest*)request{
     NSURLResponse* urlResponse;
     NSError* error = nil;
