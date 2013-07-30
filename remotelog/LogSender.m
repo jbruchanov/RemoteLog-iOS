@@ -42,14 +42,16 @@ static LogSender* _logSender;
     }
     [_logSender stop];
     [_logSender.queue removeAllObjects];
-    if(_logSender.semaphore){
-        dispatch_release(_logSender.semaphore);
+    @synchronized(_logSender){
+        if(_logSender.semaphore){
+            dispatch_release(_logSender.semaphore);
+        }
     }
+    _logSender.connector = nil;
     _logSender.semaphore = NULL;
-    _logSender = nil;
-    _logSender = nil;
-    _logSender = nil;
-    _logSender = nil;
+    _logSender.queue = nil;
+    _logSender.semaphore = nil;
+    _logSender.workingQueue = nil;
 }
 
 -(id)initWithServiceConnector:(ServiceConnector*)connector{
@@ -66,14 +68,16 @@ static LogSender* _logSender;
     if(!self.isRunning){
         self.isRunning = YES;
         self.semaphore = dispatch_semaphore_create(0);
-        self.workingQueue = dispatch_queue_create("com.scurab.ios.rlog.LogSender",NULL);
+        self.workingQueue = dispatch_queue_create("com.scurab.ios.rlog.LogSender",NULL);        
         dispatch_async(self.workingQueue, ^{
             [_logSender workingThreadImpl];
-            if(_logSender.semaphore){
-                dispatch_release(_logSender.semaphore);
+            @synchronized(_logSender){
+                if(_logSender.semaphore){
+                    dispatch_release(_logSender.semaphore);
+                }
             }
             _logSender.semaphore = NULL;
-            self.isRunning = NO;
+            _logSender.isRunning = NO;
         });
     }
 }
@@ -81,7 +85,7 @@ static LogSender* _logSender;
 
 -(void) stop{
     self.isRunning = NO;
-    //TODO:notify
+    dispatch_semaphore_signal(self.semaphore);
 }
 
 -(void) workingThreadImpl{
@@ -124,7 +128,7 @@ static LogSender* _logSender;
 }
 
 -(void)addLogItem:(LogItem*)item withBlob:(LogItemBlobRequest*) request{
-    if(_isRunning){
+    if(self.isRunning){
         DataContainer *dc = [DataContainer new];
         dc.logItem = item;
         dc.blobRequest = request;

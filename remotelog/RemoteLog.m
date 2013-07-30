@@ -25,13 +25,15 @@
 
 #pragma mark static variables
 
-/* Singleton instance variable */
+/* Static instance variable */
 static RemoteLog * _remoteLog;
 static NSUserDefaults * _userDefaults;
+
 static BOOL _isRunning;
 static NSString *_owner;
 static NSString *_userName;
 static NSString *_password;
+
 static int _deviceId;
 static NSString *_appBuild;
 static NSString *_appName;
@@ -64,6 +66,7 @@ static NSDateFormatter *_dateFormater;
  Release anything related with RemoteLog
  */
 +(void)release{
+    [LogSender release];
     _remoteLog = nil;
     _userDefaults = nil;
     _owner = nil;
