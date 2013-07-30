@@ -22,7 +22,6 @@
 @property (nonatomic, strong, readonly) NSString* BlobMime;
 @property (nonatomic) int DeviceID;
 
-
 +(LogItem*) logItemWithSampleData:(int)DeviceID;
 
 @end
