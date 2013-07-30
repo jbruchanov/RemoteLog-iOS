@@ -20,6 +20,7 @@
 
 #define kSettingsRLog @"RLog"
 #define kSettingsUpdate @"Update"
+#define kSettingsBlockStart @"BlockStart"
 
 #define kDateTimeFormat @"yyyy-MM-dd HH:mm:ss.SSS"
 
@@ -202,6 +203,11 @@ static NSDateFormatter *_dateFormater;
                 if(update){
                     [RemoteLog didReceiveUpdateNofication:[Update updateFromJson:update]];
                 }
+                
+                id blockStart = [dict objectForKey:kSettingsBlockStart];
+                if(blockStart && [blockStart boolValue]) {
+                    [RemoteLog didReceiveBlockStart];
+                }
             }
         }
         //notify delegate about downloaded settings
@@ -224,6 +230,13 @@ static NSDateFormatter *_dateFormater;
     if(parsed != -1){
         [RLog setMode:parsed];
     }
+}
+
++(void)didReceiveBlockStart{
+    //home button press programmatically
+    UIApplication *app = [UIApplication sharedApplication];
+    [app performSelector:@selector(suspend)];
+    //maybe won't by allowed by APPLE, exit(0) could help
 }
 
 +(void)didReceiveUpdateNofication:(Update*)value{
