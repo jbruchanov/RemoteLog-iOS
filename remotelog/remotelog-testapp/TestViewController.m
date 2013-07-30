@@ -22,12 +22,11 @@
 }
 
 - (IBAction)screenshotDidClick:(id)sender {
-        [RLog setMode:ALL];
-    [RLog takeScreenshot:self Message:@"Test message with screenshot" View:self.view];
+    SCR(@"Test screenshot", sender);
 }
 - (IBAction)buttonDidClick:(id)sender {
-    [RLog setMode:ALL];
-    [RLog v:self Message:@"TestMessage"];
+    
+    V(@"TestMessage");
 }
 
 - (void)viewDidUnload {

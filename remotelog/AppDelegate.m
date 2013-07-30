@@ -9,6 +9,11 @@
 #import "AppDelegate.h"
 #import "RemoteLog.h"
 #import "TestViewController.h"
+#import "RLog.h"
+
+@interface AppDelegate() <RemoteLogRegistrationDelegate>
+
+@end
 
 @implementation AppDelegate
 
@@ -33,11 +38,15 @@
     NSString *filePath = [bundle pathForResource:@"PrivateSettings" ofType:@"plist"];
     NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:filePath];
     NSString* serverUrl = [dict valueForKey:@"ServerURL"];
-    [RemoteLog startWithAppName:@"RemoteLog-iOS" forServerLocation:serverUrl withDelegate:nil];
+    [RemoteLog startWithAppName:@"RemoteLog-iOS" forServerLocation:serverUrl withDelegate:self];
 }
 
 -(void) stopRemoteLog{
     [RemoteLog release];
+}
+
+-(void)didFinish{
+    [RLog setMode:ALL];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
