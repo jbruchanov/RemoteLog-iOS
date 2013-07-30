@@ -7,11 +7,11 @@
 //
 
 #import "RLog.h"
-#import "LogItemBlobRequest.h"
 #import "RemoteLog.h"
 #import "LogSender.h"
 
 #define SEPARATOR @"|"
+#define Log(category, msg) NSLog(@"[%@] %@", category, msg);
 
 @implementation RLog
 
@@ -20,6 +20,7 @@ static int _mode = ALL;
 
 +(void) n:(id) source Category:(NSString*) category Message:(NSString*)msg{
     [RLog send:source Category:category Message:msg];
+    Log(category, msg);
 }
 
 +(void) i:(id) source Message:(NSString*)msg{
@@ -30,6 +31,7 @@ static int _mode = ALL;
     if ((_mode & INFO) == INFO) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void) d:(id) source Message:(NSString*)msg{
@@ -40,6 +42,7 @@ static int _mode = ALL;
     if ((_mode & DEBUG) == DEBUG) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void) e:(id) source Message:(NSString*)msg{
@@ -50,6 +53,7 @@ static int _mode = ALL;
     if ((_mode & ERROR) == ERROR) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void) v:(id) source Message:(NSString*)msg{
@@ -60,6 +64,7 @@ static int _mode = ALL;
     if ((_mode & VERBOSE) == VERBOSE) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void) w:(id) source Message:(NSString*)msg{
@@ -70,6 +75,7 @@ static int _mode = ALL;
     if ((_mode & WARNING) == WARNING) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void) wtf:(id) source Message:(NSString*)msg{
@@ -80,6 +86,7 @@ static int _mode = ALL;
     if ((_mode & WTF) == WTF) {
         [RLog send:source Category:category Message:msg];
     }
+    Log(category, msg);
 }
 
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view{
@@ -91,15 +98,13 @@ static int _mode = ALL;
     }
 }
 
-
 +(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg{
     [RLog send:source Category:category Message:msg LogItemBlob:nil];
 }
 
 
 +(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg LogItemBlob:(LogItemBlobRequest*)blobReq{
-    NSLog(@"[%@] %@", category, msg);
-    NSLog(@"%@",[NSThread callStackSymbols]);
+//    NSLog(@"%@",[NSThread callStackSymbols]);
     if(_local_mode || _mode == TURN_OFF){
         return;
     }
@@ -153,7 +158,7 @@ static int _mode = ALL;
         mode = [mode stringByTrimmingCharactersInSet:whiteSpaces];
         NSArray *values = [mode componentsSeparatedByString:SEPARATOR];
         for(NSString *value in values){
-            NSString *v = [value stringByTrimmingCharactersInSet:whiteSpaces];
+            NSString *v = [[value stringByTrimmingCharactersInSet:whiteSpaces] capitalizedString];
             int parsedValue = [RLog getModeValue:v];
             if(parsedValue >= TURN_OFF && parsedValue <= (ALL)){
                 found = YES;
