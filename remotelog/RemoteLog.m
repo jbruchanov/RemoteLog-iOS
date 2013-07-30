@@ -185,16 +185,16 @@ static NSDateFormatter *_dateFormater;
     }
 
     //updated serverId, should be same
-    int serverDeviceId = r.HasError ? 0 : [[r.Context objectForKey:@"DeviceID"] intValue];
+    _deviceId = r.HasError ? 0 : [[r.Context objectForKey:@"DeviceID"] intValue];
     
-    if(r.HasError || serverDeviceId == 0){
+    if(r.HasError || _deviceId == 0){
         [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorRegistrationError userInfo:@{kResponse: r}]
                        withDelegate:delegate];
         return NO;
     }
     
     //update device ID
-    [_userDefaults setInteger:(NSInteger)serverDeviceId forKey:kDeviceId];
+    [_userDefaults setInteger:(NSInteger)_deviceId forKey:kDeviceId];
     [_userDefaults synchronize];
     
     return YES;
@@ -306,7 +306,10 @@ static NSDateFormatter *_dateFormater;
     }
 }
 
-+(LogItem*) logItemWithDefaultValues{    
++(LogItem*) logItemWithDefaultValues{
+    if(_deviceId == 0){
+        return nil;
+    }
     LogItem *item = [LogItem new];
     item.DeviceID = _deviceId;
     item.AppBuild = _appBuild;
