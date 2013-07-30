@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Jiri Bruchanov. All rights reserved.
 //
 
+//TODO: push notifications support
+//TODO: toast notification about update
+
 #import "RemoteLog.h"
 #import "Device.h"
 #import "ServiceConnector.h"
@@ -105,6 +108,7 @@ static NSDateFormatter *_dateFormater;
         return;
     }
     
+    //init some default data for usage with RemoteLog
     NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
     _dateFormater = [[NSDateFormatter alloc] init];
     [_dateFormater setDateFormat:kDateTimeFormat];
@@ -117,13 +121,16 @@ static NSDateFormatter *_dateFormater;
     _appBuild = [bundle valueForKey:@"CFBundleVersion"];
     
     ServiceConnector *connector = [[ServiceConnector alloc]initWithURL:serverLocation userName:nil andPassword:nil];
+
     //init logSender
     [[[LogSender alloc]initWithServiceConnector:connector] start];
     
-    
+    //run async registration process
     dispatch_async(dispatch_queue_create(kRemoteLogC, NULL), ^{
         @try {
+            //send registration
             BOOL reged = [RemoteLog sendRegistrationWith:connector withAppName:appName withDelegate:delegate];
+            //if fine, try download any settings from server
             if(reged){
                 [RemoteLog loadSettingsForApp:appName withServiceConnector:connector withDelegate:delegate];
             }
@@ -148,11 +155,16 @@ static NSDateFormatter *_dateFormater;
 
 /*
  Send device registration to server and update defaults for devID
+ @param connector
+ @param appName
+ @param delegate
+ @return YES if registration was successful
  */
 +(BOOL)sendRegistrationWith:(ServiceConnector*) conector
                 withAppName:(NSString*) appName
                withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     
+    //try get deviceId, 0 if unknown
     _deviceId = [_userDefaults integerForKey:kDeviceId];
     
     Device *dev = [Device deviceWithRealValues];
@@ -162,14 +174,17 @@ static NSDateFormatter *_dateFormater;
     dev.AppVersion = _appVersion;
     dev.DeviceID = _deviceId;
     
+    //send device to server
     Response *r = [conector saveDevice:dev];
+    
     //check responses
     if(!r){
         [RemoteLog notifyAboutError:[[NSException alloc]initWithName:kRemoteLog reason:kErrorUnableToSendRegistration userInfo:nil]
                        withDelegate:delegate];
         return NO;
     }
-    
+
+    //updated serverId, should be same
     int serverDeviceId = r.HasError ? 0 : [[r.Context objectForKey:@"DeviceID"] intValue];
     
     if(r.HasError || serverDeviceId == 0){
@@ -185,27 +200,36 @@ static NSDateFormatter *_dateFormater;
     return YES;
 }
 
+/* 
+ Load custom settings
+ 
+ @param appName
+ @param connector
+ @param delegate
+ */
 +(void) loadSettingsForApp:(NSString*)appName withServiceConnector:(ServiceConnector*) connector withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     int devId = [_userDefaults integerForKey:kDeviceId];
     
     Response *resp = [connector loadSettings:devId forApp:appName];
     NSArray *settings = [Settings settingsFromJsonArray:resp.Context];
+    
     if(settings && [settings count] > 0){
+        //there can be multiple settings object (1st - global, 2nd - target for this particular device)
         for(Settings *s in settings){
             NSDictionary *dict = s.JsonValueDictionary;
             if(dict){
                 id rlog = [dict objectForKey:kSettingsRLog];
-                if(rlog){
+                if(rlog){ //Different logging value
                     [RemoteLog didReceiveRLogSettings:rlog];
                 }
                 
                 NSDictionary *update = [dict objectForKey:kSettingsUpdate];
-                if(update){
+                if(update){ //we have update notification
                     [RemoteLog didReceiveUpdateNofication:[Update updateFromJson:update]];
                 }
                 
                 id blockStart = [dict objectForKey:kSettingsBlockStart];
-                if(blockStart && [blockStart boolValue]) {
+                if(blockStart && [blockStart boolValue]) {//we have blockStart settings
                     [RemoteLog didReceiveBlockStart];
                 }
             }
@@ -241,9 +265,9 @@ static NSDateFormatter *_dateFormater;
 
 +(void)didReceiveUpdateNofication:(Update*)value{
     NSString *newBuild = value.Build;
-    if([newBuild floatValue] > [_appBuild floatValue]){
+    if([newBuild floatValue] > [_appBuild floatValue]){//server says new version exists
         dispatch_async(dispatch_get_main_queue(), ^{
-            if(value.Type == Dialog){
+            if(value.Type == Dialog){//show dialog about that
                 [[[UIAlertView alloc]initWithTitle:NSLocalizedString(@"Update", @"Update")
                                            message:value.Message
                                           delegate:nil

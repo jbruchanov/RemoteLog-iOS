@@ -23,7 +23,6 @@
 @protocol RemoteLogRegistrationDelegate <NSObject>
 
 @required
-//-(void) didFinish:(RemoteLog*) remoteLog;
 -(void) didFinish;
 
 @optional
@@ -36,6 +35,9 @@
 
 /*
  Initialize registration
+ @param appName
+ @param serverLocation
+ @param delegate optional
  */
 +(void)startWithAppName:(NSString*)appName
       forServerLocation:(NSString*)serverLocation
@@ -53,9 +55,14 @@
 
 /*
  Set custom owner for Device
+ @param owner
  */
 +(void)setOwner:(NSString*) owner;
 
+/*
+ Create template of LogItem object for RLog
+ @return 
+ */
 +(LogItem*) logItemWithDefaultValues;
 
 @end
