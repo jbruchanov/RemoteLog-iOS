@@ -8,6 +8,8 @@
 
 #import "RLog.h"
 #import "LogItemBlobRequest.h"
+#import "RemoteLog.h"
+#import "LogSender.h"
 
 #define SEPARATOR @"|"
 
@@ -83,12 +85,15 @@ static int _mode = ALL;
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view{
     if ((_mode & SCREENSHOT) == SCREENSHOT) {
         NSData *image = [RLog saveViewToJPEG:view];
+        LogItemBlobRequest *blobReq = [LogItemBlobRequest requestForData:image ForType:MIME_IMAGE_JPEG];
+        blobReq.FileName = @"screenshot.jpg";
+        [RLog send:source Category:@"Screenshot" Message:msg LogItemBlob:blobReq];
     }
 }
 
 
 +(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg{
-    [RLog send:source Category:category Message:msg Data:nil];
+    [RLog send:source Category:category Message:msg LogItemBlob:nil];
 }
 
 
@@ -97,6 +102,23 @@ static int _mode = ALL;
     NSLog(@"%@",[NSThread callStackSymbols]);
     if(_local_mode || _mode == TURN_OFF){
         return;
+    }
+    
+    LogItem *item = [RemoteLog logItemWithDefaultValues];
+    if(!item){
+        return;//not initialized yet
+    }
+    item.Category = category;
+    item.Message = msg;
+    if(source){
+        item.Source = NSStringFromClass([source class]);
+    }else{
+        item.Source = @"Unknown";
+    }
+    
+    LogSender *sender = [LogSender instance];
+    if(sender){
+        [sender addLogItem:item withBlob:blobReq];
     }
 }
 

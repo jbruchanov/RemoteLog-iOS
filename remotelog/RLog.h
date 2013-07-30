@@ -26,7 +26,7 @@
 +(void) v:(id) source Message:(NSString*)msg;
 +(void) v:(id) source Category:(NSString*) category Message:(NSString*)msg;
 +(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg;
-+(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg Data:(NSData*)data;
+//+(void) send:(id) source Category:(NSString*) category Message:(NSString*)msg Data:(NSData*)data;
 
 +(void)takeScreenshot:(id) source Message:(NSString*)msg View:(UIView*)view;
 
