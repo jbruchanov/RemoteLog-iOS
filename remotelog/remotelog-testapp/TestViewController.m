@@ -22,7 +22,7 @@
 }
 
 - (IBAction)screenshotDidClick:(id)sender {
-    SCR(@"Test screenshot", sender);
+    SCR(@"Test screenshot", self.view);
 }
 - (IBAction)buttonDidClick:(id)sender {
     
