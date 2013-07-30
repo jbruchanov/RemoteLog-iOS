@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Jiri Bruchanov. All rights reserved.
 //
 
+//TODO HTTPS usage
+//TODO Test with Basic credentials
+
 #import <Foundation/Foundation.h>
 #import "Response.h"
 #import "Device.h"

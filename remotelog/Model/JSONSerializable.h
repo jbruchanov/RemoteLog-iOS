@@ -13,8 +13,10 @@
 /* Convert object into json dictionary string then into NSData */
 -(NSData*) toJson;
 
+/* Covnert object into json NSString value */
 -(NSString*) toJsonString;
 
+/* Override this method if you want to skip some field for JSON serialization */
 -(BOOL) isFieldSerializable:(NSString*) fieldName;
 
 @end

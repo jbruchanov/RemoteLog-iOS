@@ -20,6 +20,8 @@
 #define kContentLen @"Content-length"
 #define kContentType @"Content-Type"
 #define kContentTypeValue @"application/json"
+#define kContentTypeValue @"application/json"
+#define kAuthorization @"Authorization"
 
 #pragma mark -
 #define HTTP_GET @"GET"
@@ -45,15 +47,10 @@ const double kDefaultTimeout = 2.0;
         self.baseUrl = url;
         
         if(username && password){
-            self.loginBase64 = [NSString stringWithFormat:@"%@:%@", [self encodeToBase64:username], [self encodeToBase64:password]];
+          self.loginBase64 = [NSString stringWithFormat:@"Basic %@:%@", [username base64Encoded], [password base64Encoded]];
         }
     }
     return self;
-}
-
--(NSString*) encodeToBase64:(NSString*) value{
-    //TODO
-    return nil;
 }
 
 #pragma mark Public
@@ -94,6 +91,9 @@ const double kDefaultTimeout = 2.0;
                                                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                             timeoutInterval:kDefaultTimeout];
     [request setHTTPMethod:HTTP_GET];
+    if(self.loginBase64){
+        [request setValue:self.loginBase64 forHTTPHeaderField:kAuthorization];
+    }
     Response *r = [self sendRequest:request];
     return r;
 }
@@ -130,6 +130,9 @@ const double kDefaultTimeout = 2.0;
     [request setValue:type forHTTPHeaderField: kContentType];
     [request setValue:[NSString stringWithFormat:@"%d", [data length]] forHTTPHeaderField:kContentLen];
     [request setHTTPBody:data];
+    if(self.loginBase64){
+        [request setValue:self.loginBase64 forHTTPHeaderField:kAuthorization];
+    }
     return request;
 }
 

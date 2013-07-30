@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 @interface NSString (URLEncoding)
 
+/*
+ Encode NSString to get valid URL string
+ */
 -(NSString *)urlEncode;
 
+-(NSString *) base64Encoded;
 @end

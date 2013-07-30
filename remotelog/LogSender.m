@@ -46,9 +46,9 @@ static LogSender* _logSender;
         if(_logSender.semaphore){
             dispatch_release(_logSender.semaphore);
         }
+        _logSender.semaphore = NULL;
     }
     _logSender.connector = nil;
-    _logSender.semaphore = NULL;
     _logSender.queue = nil;
     _logSender.semaphore = nil;
     _logSender.workingQueue = nil;
@@ -75,8 +75,8 @@ static LogSender* _logSender;
                 if(_logSender.semaphore){
                     dispatch_release(_logSender.semaphore);
                 }
+                _logSender.semaphore = NULL;
             }
-            _logSender.semaphore = NULL;
             _logSender.isRunning = NO;
         });
     }

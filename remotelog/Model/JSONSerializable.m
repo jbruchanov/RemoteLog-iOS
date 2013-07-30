@@ -26,13 +26,11 @@
         if(![self isFieldSerializable:name]){
             continue;
         }
-//        NSString *attributesString = [[NSString alloc] initWithUTF8String:property_getAttributes(property)];
         id value = [((id)self) valueForKey:name];
         
 #ifdef DEBUG
         NSLog(@"%@:%@", name, value);
 #endif
-        
         if(value){
             [dict setObject:value forKey:name];
         }
