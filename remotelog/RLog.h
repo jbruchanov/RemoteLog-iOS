@@ -19,7 +19,8 @@
 #define EXCEPTION 1 << 5
 #define WTF 1 << 6
 #define SCREENSHOT 1 << 7
-#define ALL INFO | VERBOSE | DEBUGG | WARNING | ERROR | EXCEPTION | WTF | SCREENSHOT
+#define ALL (INFO | VERBOSE | DEBUGG | WARNING | ERROR | EXCEPTION | WTF | SCREENSHOT)
+
 
 @interface RLog : NSObject
 
