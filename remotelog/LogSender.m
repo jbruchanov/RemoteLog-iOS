@@ -128,7 +128,9 @@ static LogSender* _logSender;
         DataContainer *dc = [DataContainer new];
         dc.logItem = item;
         dc.blobRequest = request;
-        [self.queue addObject:dc];
+        @synchronized(self.queue){
+            [self.queue addObject:dc];
+        }
         dispatch_semaphore_signal(self.semaphore);
     }
 }
