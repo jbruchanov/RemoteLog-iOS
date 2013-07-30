@@ -12,6 +12,7 @@
 #import "RLog.h"
 #import "Settings.h"
 #import "Update.h"
+#import "LogSender.h"
 
 #define kDeviceId @"DEVICE_ID"
 #define kRemoteLog @"RemoteLog"
@@ -20,14 +21,22 @@
 #define kSettingsRLog @"RLog"
 #define kSettingsUpdate @"Update"
 
+#define kDateTimeFormat @"yyyy-MM-dd HH:mm:ss.SSS"
+
 #pragma mark static variables
+
 /* Singleton instance variable */
-static RemoteLog * _instance;
+static RemoteLog * _remoteLog;
 static NSUserDefaults * _userDefaults;
 static BOOL _isRunning;
 static NSString *_owner;
 static NSString *_userName;
 static NSString *_password;
+static int _deviceId;
+static NSString *_appBuild;
+static NSString *_appName;
+static NSString *_appVersion;
+static NSDateFormatter *_dateFormater;
 
 
 @implementation RemoteLog
@@ -48,16 +57,19 @@ static NSString *_password;
  Get singleton instance of RemoteLog
  */
 +(RemoteLog*) instance{
-    return _instance;
+    return _remoteLog;
 }
 
 /*
  Release anything related with RemoteLog
  */
 +(void)release{
-    _instance = nil;
+    _remoteLog = nil;
     _userDefaults = nil;
     _owner = nil;
+    _appBuild = nil;
+    _appName = nil;
+    _appVersion = nil;
 }
 
 +(void)startWithAppName:(NSString*)appName
@@ -89,10 +101,21 @@ static NSString *_password;
         return;
     }
     
+    NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
+    _dateFormater = [[NSDateFormatter alloc] init];
+    [_dateFormater setDateFormat:kDateTimeFormat];
+    
     _isRunning = YES;
     _userDefaults = [[NSUserDefaults alloc]initWithUser:kRemoteLog];
+
+    _appName = appName;
+    _appVersion = [bundle valueForKey:@"CFBundleShortVersionString"];
+    _appBuild = [bundle valueForKey:@"CFBundleVersion"];
     
     ServiceConnector *connector = [[ServiceConnector alloc]initWithURL:serverLocation userName:nil andPassword:nil];
+    //init logSender
+    [[[LogSender alloc]initWithServiceConnector:connector] start];
+    
     
     dispatch_async(dispatch_queue_create(kRemoteLogC, NULL), ^{
         @try {
@@ -126,16 +149,14 @@ static NSString *_password;
                 withAppName:(NSString*) appName
                withDelegate:(id<RemoteLogRegistrationDelegate>)delegate{
     
-    NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
-    NSString *appVersion = [bundle valueForKey:@"CFBundleShortVersionString"];
-    NSInteger deviceId = [_userDefaults integerForKey:kDeviceId];
+    _deviceId = [_userDefaults integerForKey:kDeviceId];
     
     Device *dev = [Device deviceWithRealValues];
     //fill rest of values for registration
     dev.Owner = _owner;
     dev.App = appName;
-    dev.AppVersion = appVersion;
-    dev.DeviceID = deviceId;
+    dev.AppVersion = _appVersion;
+    dev.DeviceID = _deviceId;
     
     Response *r = [conector saveDevice:dev];
     //check responses
@@ -203,10 +224,8 @@ static NSString *_password;
 }
 
 +(void)didReceiveUpdateNofication:(Update*)value{
-    NSDictionary *bundle = [[NSBundle mainBundle] infoDictionary];
-    NSString *appBuild = [bundle valueForKey:@"CFBundleVersion"];
     NSString *newBuild = value.Build;
-    if([newBuild floatValue] > [appBuild floatValue]){
+    if([newBuild floatValue] > [_appBuild floatValue]){
         dispatch_async(dispatch_get_main_queue(), ^{
             if(value.Type == Dialog){
                 [[[UIAlertView alloc]initWithTitle:NSLocalizedString(@"Update", @"Update")
@@ -245,6 +264,16 @@ static NSString *_password;
     }else{
         _isRunning = NO;
     }
+}
+
++(LogItem*) logItemWithDefaultValues{    
+    LogItem *item = [LogItem new];
+    item.DeviceID = _deviceId;
+    item.AppBuild = _appBuild;
+    item.Application = _appName;
+    item.AppVersion = _appVersion;
+    item.Date = [_dateFormater stringFromDate:[NSDate date]];
+    return item;
 }
 
 @end

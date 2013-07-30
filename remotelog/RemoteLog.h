@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "LogItem.h"
 
 #define kErrorRegistrationAlreadyStarted @"RegistrationAlreadyStarted"
 #define kErrorIncompleteCredentials @"IncompleteCredentials"
@@ -54,5 +55,7 @@
  Set custom owner for Device
  */
 +(void)setOwner:(NSString*) owner;
+
++(LogItem*) logItemWithDefaultValues;
 
 @end
