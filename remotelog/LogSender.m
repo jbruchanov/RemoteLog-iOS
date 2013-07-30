@@ -9,15 +9,17 @@
 #import "LogSender.h"
 #import "LogItemBlobRequest.h"
 
+#pragma mark DataContainer
+/*
+ Just help class to tide up logItem with blob 
+ */
 @interface DataContainer : NSObject
 @property (nonatomic, strong) LogItem* logItem;
 @property (nonatomic, strong) LogItemBlobRequest* blobRequest;
 @end
+@implementation DataContainer @end
 
-@implementation DataContainer
-@end
-
-
+#pragma mark LogSender
 @interface LogSender()
 
 @property (nonatomic, strong) ServiceConnector *connector;
@@ -30,6 +32,7 @@
 
 @implementation LogSender
 
+//static instance
 static LogSender* _logSender;
 
 +(LogSender*) instance{
@@ -67,10 +70,14 @@ static LogSender* _logSender;
 -(void) start{
     if(!self.isRunning){
         self.isRunning = YES;
+        //create semaphor and workingQueue
         self.semaphore = dispatch_semaphore_create(0);
         self.workingQueue = dispatch_queue_create("com.scurab.ios.rlog.LogSender",NULL);        
+
         dispatch_async(self.workingQueue, ^{
+            //start working thread async
             [_logSender workingThreadImpl];
+            //clean when we stopped that
             @synchronized(_logSender){
                 if(_logSender.semaphore){
                     dispatch_release(_logSender.semaphore);
@@ -85,7 +92,11 @@ static LogSender* _logSender;
 
 -(void) stop{
     self.isRunning = NO;
-    dispatch_semaphore_signal(self.semaphore);
+    @synchronized(_logSender){
+        if(self.semaphore){
+            dispatch_semaphore_signal(self.semaphore);
+        }
+    }
 }
 
 -(void) workingThreadImpl{
@@ -95,8 +106,8 @@ static LogSender* _logSender;
             DataContainer *container = nil;
             
             @synchronized(self.queue){//get item
-                container = [self.queue lastObject];//LIFO, not FIFO!
-                [self.queue removeLastObject];
+                container = [self.queue objectAtIndex:0];
+                [self.queue removeObjectAtIndex:0];//all indexes will do -1
             }
             
             LogItem *logItem = container.logItem;
@@ -132,10 +143,15 @@ static LogSender* _logSender;
         DataContainer *dc = [DataContainer new];
         dc.logItem = item;
         dc.blobRequest = request;
+        
         @synchronized(self.queue){
             [self.queue addObject:dc];
         }
-        dispatch_semaphore_signal(self.semaphore);
+        @synchronized(_logSender){
+            if(self.semaphore){
+                dispatch_semaphore_signal(self.semaphore);
+            }
+        }
     }
 }
 
